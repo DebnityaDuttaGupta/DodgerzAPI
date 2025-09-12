@@ -25,7 +25,17 @@ List<PlayerScore> leaderboard = LeaderboardStorage.LoadLeaderboard(leaderboardFi
 app.MapGet("/leaderboard", () =>
 {
     var sorted = leaderboard.OrderByDescending(s => s.Score).ToList();
-    return Results.Json(sorted);
+
+    var unityFormnat = new
+    {
+        Items = sorted.Select(p => new
+        {
+            playerName = p.PlayerName,
+            score = p.Score
+        }).ToArray()
+    };
+
+    return Results.Json(unityFormnat);
 });
 
 //Submit Score
