@@ -30,7 +30,7 @@ app.MapGet("/leaderboard", () =>
     {
         Items = sorted.Select(p => new
         {
-            playerName = p.PlayerName,
+            playerName = p.playerName,
             score = p.Score
         }).ToArray()
     };
@@ -43,13 +43,13 @@ app.MapPost("/leaderboard", async (HttpRequest request) =>
 {
     var body = await JsonSerializer.DeserializeAsync<PlayerScore>(request.Body);
 
-    if (body is null || string.IsNullOrEmpty(body.PlayerName))
+    if (body is null || string.IsNullOrEmpty(body.playerName))
     {
         return Results.BadRequest("PlayerName and Score are required");
     }
 
     // Check if player exists
-    var existing = leaderboard.FirstOrDefault(p => p.PlayerName == body.PlayerName);
+    var existing = leaderboard.FirstOrDefault(p => p.playerName == body.playerName);
     if (existing != null)
     {
         if (body.Score > existing.Score)
@@ -73,14 +73,15 @@ app.Run($"http://0.0.0.0:{port}");
 
 public class PlayerScore
 {
-    public string PlayerName { get; set; }
+    public string playerName { get; set; }
     public float Score { get; set; }
 
     public PlayerScore()
     {
-        PlayerName = string.Empty;
+        playerName = string.Empty;
     }
 }
+
 public static class LeaderboardStorage
 {
     public static List<PlayerScore> LoadLeaderboard(string filePath)
