@@ -24,18 +24,36 @@ List<PlayerScore> leaderboard = LeaderboardStorage.LoadLeaderboard(leaderboardFi
 // Get Leaderboard
 app.MapGet("/leaderboard", () =>
 {
-    var sorted = leaderboard.OrderByDescending(s => s.Score).ToList();
+    var sorted = leaderboard.OrderByDescending(s => s.score).ToList();
 
+    /*
+    var result = new Dictionary<string, object>
+    {
+        ["Items"] = sorted.Select(p => new Dictionary<string, object>
+        {
+            ["playerName"] = p.playerName,
+            ["score"] = p.score
+        }).ToArray()
+    };
+
+    return Results.Json(result);
+    */
+
+    
     var unityFormnat = new
     {
         Items = sorted.Select(p => new
         {
             playerName = p.playerName,
-            score = p.Score
+            score = p.score
         }).ToArray()
     };
 
+    var jsonResult = JsonSerializer.Serialize(unityFormnat);
+    Console.WriteLine($"API sending JSON: {jsonResult}");
+
     return Results.Json(unityFormnat);
+    
 });
 
 //Submit Score
@@ -52,9 +70,9 @@ app.MapPost("/leaderboard", async (HttpRequest request) =>
     var existing = leaderboard.FirstOrDefault(p => p.playerName == body.playerName);
     if (existing != null)
     {
-        if (body.Score > existing.Score)
+        if (body.score > existing.score)
         {
-            existing.Score = body.Score;
+            existing.score = body.score;
         }
     }
     else
@@ -74,7 +92,7 @@ app.Run($"http://0.0.0.0:{port}");
 public class PlayerScore
 {
     public string playerName { get; set; }
-    public float Score { get; set; }
+    public float score { get; set; }
 
     public PlayerScore()
     {
